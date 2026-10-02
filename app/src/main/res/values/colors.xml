@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Background Colors -->
+    <color name="bg_primary">#0F111A</color>
+    <color name="surface_dark">#1A1D2E</color>
+    <color name="surface_card">#1E2132</color>
+    <color name="card_stroke">#2A2F45</color>
+
+    <!-- Accent Colors -->
+    <color name="accent_red">#FF4757</color>
+    <color name="accent_red_dark">#CC2233</color>
+    <color name="accent_green">#2ED573</color>
+    <color name="accent_orange">#FFA502</color>
+    <color name="accent_purple">#7C4DFF</color>
+    <color name="accent_blue">#1E90FF</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#F1F2F6</color>
+    <color name="text_secondary">#A4B0BE</color>
+    <color name="text_tertiary">#636E7C</color>
+
+    <!-- Status Colors -->
+    <color name="status_idle">#1A1D2E</color>
+    <color name="status_recording">#3D0B0B</color>
+    <color name="status_playing">#0B2D1A</color>
+    <color name="status_warning">#2D2400</color>
+
+    <!-- Warning Banner Colors -->
+    <color name="warning_bg">#2D1F00</color>
+    <color name="warning_stroke">#FFB300</color>
+    <color name="warning_text">#FFB300</color>
+    <color name="info_bg">#001F3D</color>
+    <color name="info_stroke">#1E90FF</color>
+    <color name="info_text">#74B9FF</color>
+
+    <!-- Material required colors -->
+    <color name="colorPrimary">#7C4DFF</color>
+    <color name="colorPrimaryDark">#5C35CC</color>
+    <color name="colorAccent">#FF4757</color>
+</resources>

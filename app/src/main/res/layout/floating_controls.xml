@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/floating_bg"
+    android:padding="8dp"
+    android:elevation="8dp">
+
+    <!-- Status text -->
+    <TextView
+        android:id="@+id/tv_float_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ready"
+        android:textColor="#FFFFFF"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal"
+        android:paddingBottom="4dp"/>
+
+    <!-- Record / Stop Record button -->
+    <ImageButton
+        android:id="@+id/btn_float_record"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/circle_button_red"
+        android:src="@drawable/ic_record"
+        android:contentDescription="Record"
+        android:padding="10dp"/>
+
+    <!-- Stop Playback button -->
+    <ImageButton
+        android:id="@+id/btn_float_stop"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/circle_button_orange"
+        android:src="@drawable/ic_stop"
+        android:contentDescription="Stop Playback"
+        android:padding="10dp"
+        android:visibility="gone"/>
+
+    <!-- Open App button -->
+    <ImageButton
+        android:id="@+id/btn_float_open"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/circle_button_gray"
+        android:src="@drawable/ic_open_app"
+        android:contentDescription="Open App"
+        android:padding="8dp"/>
+
+</LinearLayout>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Macro Recorder</string>
+    <string name="accessibility_service_label">Macro Recorder Service</string>
+    <string name="accessibility_service_description">Allows Macro Recorder to capture your screen interactions (taps, swipes, typing, app launches) for recording and replaying automation macros. This service runs only when actively recording or playing back a macro.</string>
+</resources>
