@@ -332,11 +332,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isAccessibilityServiceEnabled(): Boolean {
+        if (MacroAccessibilityService.instance != null) return true
+        val expectedShort = android.content.ComponentName(this, MacroAccessibilityService::class.java).flattenToShortString()
+        val expectedLong = android.content.ComponentName(this, MacroAccessibilityService::class.java).flattenToString()
         val enabledServices = Settings.Secure.getString(
             contentResolver,
             Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
         ) ?: return false
-        return enabledServices.contains("com.macrorecorder.app/.service.MacroAccessibilityService")
+        return enabledServices.contains(expectedShort) || enabledServices.contains(expectedLong)
     }
 
     private fun showAccessibilityDialog() {

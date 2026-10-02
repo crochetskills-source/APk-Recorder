@@ -120,122 +120,122 @@ class MacroAccessibilityService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event == null || !isRecording) return
 
-        val node = event.source
-        val packageName = event.packageName?.toString() ?: ""
+        try {
+            val node = event.source
+            val packageName = event.packageName?.toString() ?: ""
 
-        // Skip our own package events
-        if (packageName == "com.macrorecorder.app") return
+            // Skip our own package events
+            if (packageName == "com.macrorecorder.app") return
 
-        when (event.eventType) {
+            when (event.eventType) {
 
-            // Window changed = app launch / navigation
-            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
-                val className = event.className?.toString() ?: ""
-                if (packageName.isNotEmpty() && className.contains("Activity")) {
-                    recordAction(
-                        RecordedAction(
-                            type = ActionType.APP_LAUNCH,
-                            timestamp = elapsedMs(),
-                            packageName = packageName,
-                            text = className
+                // Window changed = app launch / navigation
+                AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
+                    val className = event.className?.toString() ?: ""
+                    if (packageName.isNotEmpty() && className.contains("Activity")) {
+                        recordAction(
+                            RecordedAction(
+                                type = ActionType.APP_LAUNCH,
+                                timestamp = elapsedMs(),
+                                packageName = packageName,
+                                text = className
+                            )
                         )
-                    )
+                    }
                 }
-            }
 
-            // Text changed = user typing
-            AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED -> {
-                val text = event.text.joinToString("").let {
-                    // Compute only the added chars (delta)
-                    val nodeKey = "${node?.viewIdResourceName}_${node?.hashCode()}"
-                    val prev = nodeTextCache[nodeKey] ?: ""
-                    nodeTextCache[nodeKey] = it
-                    it // record full text each time for reliability
+                // Text changed = user typing
+                AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED -> {
+                    val text = event.text.joinToString("").let {
+                        val nodeKey = "${node?.viewIdResourceName}_${node?.hashCode()}"
+                        val prev = nodeTextCache[nodeKey] ?: ""
+                        nodeTextCache[nodeKey] = it
+                        it
+                    }
+                    if (text.isNotEmpty()) {
+                        recordAction(
+                            RecordedAction(
+                                type = ActionType.TYPE_TEXT,
+                                timestamp = elapsedMs(),
+                                text = text,
+                                nodeId = node?.viewIdResourceName ?: "",
+                                nodeClass = node?.className?.toString() ?: "",
+                                nodeText = node?.text?.toString() ?: ""
+                            )
+                        )
+                    }
                 }
-                if (text.isNotEmpty()) {
+
+                // View clicked
+                AccessibilityEvent.TYPE_VIEW_CLICKED -> {
+                    if (!isPlaying) {
+                        val rect = android.graphics.Rect()
+                        node?.getBoundsInScreen(rect)
+                        val cx = if (rect.width() > 0 && rect.height() > 0) rect.centerX().toFloat() else 0f
+                        val cy = if (rect.width() > 0 && rect.height() > 0) rect.centerY().toFloat() else 0f
+                        recordAction(
+                            RecordedAction(
+                                type = ActionType.CLICK_NODE,
+                                timestamp = elapsedMs(),
+                                x = cx,
+                                y = cy,
+                                nodeId = node?.viewIdResourceName ?: "",
+                                nodeClass = node?.className?.toString() ?: "",
+                                nodeText = node?.text?.toString() ?: "",
+                                packageName = packageName
+                            )
+                        )
+                    }
+                }
+
+                // View long clicked
+                AccessibilityEvent.TYPE_VIEW_LONG_CLICKED -> {
+                    if (!isPlaying) {
+                        val rect = android.graphics.Rect()
+                        node?.getBoundsInScreen(rect)
+                        val cx = if (rect.width() > 0 && rect.height() > 0) rect.centerX().toFloat() else 0f
+                        val cy = if (rect.width() > 0 && rect.height() > 0) rect.centerY().toFloat() else 0f
+                        recordAction(
+                            RecordedAction(
+                                type = ActionType.LONG_PRESS,
+                                timestamp = elapsedMs(),
+                                x = cx,
+                                y = cy,
+                                nodeId = node?.viewIdResourceName ?: "",
+                                nodeClass = node?.className?.toString() ?: "",
+                                nodeText = node?.text?.toString() ?: "",
+                                packageName = packageName,
+                                duration = 800L
+                            )
+                        )
+                    }
+                }
+
+                // Scrolled
+                AccessibilityEvent.TYPE_VIEW_SCROLLED -> {
+                    val direction = when {
+                        event.scrollDeltaY > 0 -> 1  // down
+                        event.scrollDeltaY < 0 -> 0  // up
+                        event.scrollDeltaX > 0 -> 3  // right
+                        event.scrollDeltaX < 0 -> 2  // left
+                        else -> 1
+                    }
                     recordAction(
                         RecordedAction(
-                            type = ActionType.TYPE_TEXT,
+                            type = ActionType.SCROLL,
                             timestamp = elapsedMs(),
-                            text = text,
+                            scrollDirection = direction,
                             nodeId = node?.viewIdResourceName ?: "",
-                            nodeClass = node?.className?.toString() ?: "",
-                            nodeText = node?.text?.toString() ?: ""
+                            nodeClass = node?.className?.toString() ?: ""
                         )
                     )
                 }
-            }
 
-            // View clicked
-            AccessibilityEvent.TYPE_VIEW_CLICKED -> {
-                // Only record click if it wasn't from our injected gesture
-                if (!isPlaying) {
-                    val rect = android.graphics.Rect()
-                    node?.getBoundsInScreen(rect)
-                    val cx = if (rect.width() > 0 && rect.height() > 0) rect.centerX().toFloat() else 0f
-                    val cy = if (rect.width() > 0 && rect.height() > 0) rect.centerY().toFloat() else 0f
-                    recordAction(
-                        RecordedAction(
-                            type = ActionType.CLICK_NODE,
-                            timestamp = elapsedMs(),
-                            x = cx,
-                            y = cy,
-                            nodeId = node?.viewIdResourceName ?: "",
-                            nodeClass = node?.className?.toString() ?: "",
-                            nodeText = node?.text?.toString() ?: "",
-                            packageName = packageName
-                        )
-                    )
-                }
+                else -> { /* Ignore other events */ }
             }
-
-            // View long clicked
-            AccessibilityEvent.TYPE_VIEW_LONG_CLICKED -> {
-                if (!isPlaying) {
-                    val rect = android.graphics.Rect()
-                    node?.getBoundsInScreen(rect)
-                    val cx = if (rect.width() > 0 && rect.height() > 0) rect.centerX().toFloat() else 0f
-                    val cy = if (rect.width() > 0 && rect.height() > 0) rect.centerY().toFloat() else 0f
-                    recordAction(
-                        RecordedAction(
-                            type = ActionType.LONG_PRESS,
-                            timestamp = elapsedMs(),
-                            x = cx,
-                            y = cy,
-                            nodeId = node?.viewIdResourceName ?: "",
-                            nodeClass = node?.className?.toString() ?: "",
-                            nodeText = node?.text?.toString() ?: "",
-                            packageName = packageName,
-                            duration = 800L
-                        )
-                    )
-                }
-            }
-
-            // Scrolled
-            AccessibilityEvent.TYPE_VIEW_SCROLLED -> {
-                val direction = when {
-                    event.scrollDeltaY > 0 -> 1  // down
-                    event.scrollDeltaY < 0 -> 0  // up
-                    event.scrollDeltaX > 0 -> 3  // right
-                    event.scrollDeltaX < 0 -> 2  // left
-                    else -> 1
-                }
-                recordAction(
-                    RecordedAction(
-                        type = ActionType.SCROLL,
-                        timestamp = elapsedMs(),
-                        scrollDirection = direction,
-                        nodeId = node?.viewIdResourceName ?: "",
-                        nodeClass = node?.className?.toString() ?: ""
-                    )
-                )
-            }
-
-            else -> { /* Ignore other events */ }
+        } catch (e: Throwable) {
+            Log.e(TAG, "Error in onAccessibilityEvent", e)
         }
-
-        node?.recycle()
     }
 
     override fun onInterrupt() {
